@@ -7,6 +7,16 @@ SpellOverflow is a full-stack question-and-answer web application inspired by St
 The wizarding theme appears in the language and eventual visual design, while the application keeps familiar and practical Q&A workflows.
 
 ---
+## 📑 Contents
+
+- [✨ Features](#-features)
+- [🪄 Thematic Terminology](#-thematic-terminology)
+- [🛠️ Tech Stack](#️-tech-stack)
+- [🧪 Project Status](#-project-status)
+- [📚 Learning Goals](#-learning-goals)
+- [📄 Disclaimer](#-disclaimer)
+
+---
 
 ## ✨ Features
 
