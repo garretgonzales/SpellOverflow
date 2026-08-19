@@ -107,3 +107,6 @@ This project is being built incrementally to practice:
 ## 📄 Disclaimer
 
 SpellOverflow is an educational project inspired by the general Q&A format of Stack Overflow. It is not affiliated with or endorsed by Stack Overflow or Stack Exchange.
+
+<img width="480" height="480" alt="Magic Read GIF" src="https://github.com/user-attachments/assets/50d96894-f725-4838-a8fc-e62bc7f93bfa" />
+
