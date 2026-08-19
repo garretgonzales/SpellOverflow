@@ -77,8 +77,8 @@ SpellOverflow uses wizard-themed language in the interface while retaining stand
 
 ## 🧪 Project Status
 
-- [ ] Project structure created
-- [ ] MySQL connection configured
+- [x] Project structure created
+- [x] MySQL connection configured
 - [ ] User registration
 - [ ] User login and JWT authentication
 - [ ] Question CRUD
