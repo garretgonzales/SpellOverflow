@@ -22,15 +22,15 @@ public class UserService {
         if (!request.getPassword().
 
                 equals(request.getConfirmPassword())) {
-            throw new IllegalArgumentException("Passwords and confirmation must match.");
+            throw new IllegalArgumentException("Password and confirmation must match.");
         }
 
         if (userRepository.existsByUsername(request.getUsername())) {
-            throw new IllegalArgumentException("Username already exists.");
+            throw new IllegalArgumentException("Username is already taken.");
         }
 
         if (userRepository.existsByEmail(request.getEmail())) {
-            throw new IllegalArgumentException("Email already exists.");
+            throw new IllegalArgumentException("Email is already registered.");
         }
 
         String passwordHash = passwordEncoder.encode(request.getPassword());
