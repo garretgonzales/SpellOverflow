@@ -1,7 +1,7 @@
 package com.spelloverflow.domain;
 
 import com.spelloverflow.data.UserRepository;
-import com.spelloverflow.domain.UserService;
+import com.spelloverflow.dto.LoginUserRequest;
 import com.spelloverflow.dto.RegisterUserRequest;
 import com.spelloverflow.models.User;
 import org.junit.jupiter.api.Test;
@@ -11,6 +11,9 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.test.util.ReflectionTestUtils;
+
+import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -22,6 +25,8 @@ import static org.mockito.Mockito.verifyNoInteractions;
 
 @ExtendWith(MockitoExtension.class)
 class UserServiceTest {
+    @Mock
+    private JwtService jwtService;
 
     @Mock
     private UserRepository userRepository;
@@ -136,4 +141,76 @@ class UserServiceTest {
         request.setConfirmPassword(confirmPassword);
         return request;
     }
+
+    // jwt service tests
+    @Test
+    void shouldReturnTokenWhenCredentialsAreValid() {
+        LoginUserRequest request = new LoginUserRequest();
+        request.setEmail("wand@example.com");
+        request.setPassword("spell-password");
+
+        User user = new User(
+                "wand_wrangler",
+                "wand@example.com",
+                "encoded-password"
+        );
+
+        ReflectionTestUtils.setField(user, "id", 42L);
+
+        given(userRepository.findByEmail(request.getEmail()))
+                .willReturn(Optional.of(user));
+        given(passwordEncoder.matches(
+                request.getPassword(),
+                user.getPasswordHash()
+        )).willReturn(true);
+        given(jwtService.generateToken(42L, "wand_wrangler"))
+                .willReturn("signed-token");
+
+        String token = userService.login(request);
+
+        assertThat(token).isEqualTo("signed-token");
+    }
+
+    @Test
+    void shouldRejectLoginWhenEmailDoesNotExist() {
+        LoginUserRequest request = new LoginUserRequest();
+        request.setEmail("missing@example.com");
+        request.setPassword("spell-password");
+
+        given(userRepository.findByEmail(request.getEmail()))
+                .willReturn(Optional.empty());
+
+        assertThatThrownBy(() -> userService.login(request))
+                .isInstanceOf(InvalidCredentialsException.class)
+                .hasMessage("Invalid email or password.");
+
+        verifyNoInteractions(passwordEncoder, jwtService);
+    }
+
+    @Test
+    void shouldRejectLoginWhenPasswordIsIncorrect() {
+        LoginUserRequest request = new LoginUserRequest();
+        request.setEmail("wand@example.com");
+        request.setPassword("wrong-password");
+
+        User user = new User(
+                "wand_wrangler",
+                "wand@example.com",
+                "encoded-password"
+        );
+
+        given(userRepository.findByEmail(request.getEmail()))
+                .willReturn(Optional.of(user));
+        given(passwordEncoder.matches(
+                request.getPassword(),
+                user.getPasswordHash()
+        )).willReturn(false);
+
+        assertThatThrownBy(() -> userService.login(request))
+                .isInstanceOf(InvalidCredentialsException.class)
+                .hasMessage("Invalid email or password.");
+
+        verifyNoInteractions(jwtService);
+    }
+
 }
