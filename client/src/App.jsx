@@ -1,14 +1,8 @@
-import { useState } from 'react'
-import './App.css'
+import "./App.css";
+import RegisterPage from "./pages/RegisterPage";
 
 function App() {
-
-  return (
-    <>
-      <section id="center">
-       </section>
-    </>
-  )
+  return <RegisterPage />;
 }
 
-export default App
+export default App;
