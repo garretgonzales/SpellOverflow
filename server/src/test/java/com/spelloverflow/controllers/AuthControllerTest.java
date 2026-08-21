@@ -1,8 +1,6 @@
 package com.spelloverflow.controllers;
 
 import com.spelloverflow.config.SecurityConfig;
-import com.spelloverflow.controllers.AuthController;
-import com.spelloverflow.controllers.GlobalExceptionHandler;
 import com.spelloverflow.domain.UserService;
 import com.spelloverflow.dto.RegisterUserRequest;
 import com.spelloverflow.models.User;
