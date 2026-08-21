@@ -1,4 +1,4 @@
-package dto;
+package com.spelloverflow.dto;
 
 import java.util.Map;
 

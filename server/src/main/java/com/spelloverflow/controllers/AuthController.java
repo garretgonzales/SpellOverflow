@@ -1,9 +1,9 @@
-package controllers;
+package com.spelloverflow.controllers;
 
-import domain.UserService;
-import dto.RegisterUserRequest;
-import dto.RegisterUserResponse;
-import models.User;
+import com.spelloverflow.domain.UserService;
+import com.spelloverflow.dto.RegisterUserRequest;
+import com.spelloverflow.dto.RegisterUserResponse;
+import com.spelloverflow.models.User;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

@@ -1,6 +1,6 @@
-package data;
+package com.spelloverflow.data;
 
-import models.User;
+import com.spelloverflow.models.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface UserRepository extends JpaRepository<User, Long> {

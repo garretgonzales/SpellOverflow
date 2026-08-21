@@ -1,4 +1,4 @@
-package dto;
+package com.spelloverflow.dto;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
