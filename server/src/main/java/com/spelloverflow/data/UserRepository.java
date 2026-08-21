@@ -12,4 +12,6 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
     // lookup method for testing if user was saved
     Optional<User> findByUsername(String username);
+
+    Optional<User> findByEmail(String email);
 }
