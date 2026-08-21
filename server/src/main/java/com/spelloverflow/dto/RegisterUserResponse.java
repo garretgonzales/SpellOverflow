@@ -1,4 +1,4 @@
-package dto;
+package com.spelloverflow.dto;
 
 
 // record: immutable data carrier

@@ -1,9 +1,9 @@
-package domain;
+package com.spelloverflow.domain;
 
 
-import data.UserRepository;
-import dto.RegisterUserRequest;
-import models.User;
+import com.spelloverflow.data.UserRepository;
+import com.spelloverflow.dto.RegisterUserRequest;
+import com.spelloverflow.models.User;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 

@@ -1,4 +1,4 @@
-package models;
+package com.spelloverflow.models;
 
 
 import jakarta.persistence.*;

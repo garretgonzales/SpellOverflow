@@ -1,8 +1,9 @@
-package domain;
+package com.spelloverflow.domain;
 
-import data.UserRepository;
-import dto.RegisterUserRequest;
-import models.User;
+import com.spelloverflow.data.UserRepository;
+import com.spelloverflow.domain.UserService;
+import com.spelloverflow.dto.RegisterUserRequest;
+import com.spelloverflow.models.User;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
