@@ -10,6 +10,7 @@ import javax.crypto.SecretKey;
 import java.time.Instant;
 import java.util.Objects;
 import java.util.Date;
+import io.jsonwebtoken.Claims;
 
 @Service
 public class JwtService {
@@ -42,6 +43,14 @@ public class JwtService {
                 .expiration(Date.from(now.plusMillis(expirationMs)))
                 .signWith(signingKey)
                 .compact();
+    }
+
+    public Claims validateToken(String token) {
+        return Jwts.parser()
+                .verifyWith(signingKey)
+                .build()
+                .parseSignedClaims(token)
+                .getPayload();
     }
 
 }

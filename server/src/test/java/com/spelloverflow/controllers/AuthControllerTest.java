@@ -20,6 +20,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import com.spelloverflow.domain.InvalidCredentialsException;
+import com.spelloverflow.domain.JwtService;
 import com.spelloverflow.dto.LoginUserRequest;
 
 
@@ -33,6 +34,9 @@ class AuthControllerTest {
 
     @MockitoBean
     private UserService userService;
+
+    @MockitoBean
+    private JwtService jwtService;
 
     @Test
     void shouldCreateAccountWhenRegistrationIsValid() throws Exception {

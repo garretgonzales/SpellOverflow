@@ -1,3 +1,29 @@
 target/
 .idea/
 *.iml
+
+# Dependencies, build output, and test caches
+node_modules/
+dist/
+dist-ssr/
+coverage/
+.vite/
+
+# Local configuration and secrets
+.env
+.env.*
+!.env.example
+!.env.*.example
+*.local
+
+# Logs and temporary files
+*.log
+*.tmp
+*.swp
+*.swo
+
+# Editors and operating systems
+.vscode/
+.DS_Store
+Thumbs.db
+Desktop.ini
