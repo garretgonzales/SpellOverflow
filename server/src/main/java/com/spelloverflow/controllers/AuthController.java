@@ -11,6 +11,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import com.spelloverflow.dto.LoginUserResponse;
+import com.spelloverflow.dto.LoginUserRequest;
 
 @RestController
 @RequestMapping("/api/auth")
@@ -36,4 +38,13 @@ public class AuthController {
 
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
+
+    @PostMapping("/login")
+    public ResponseEntity<LoginUserResponse> login(
+            @Valid @RequestBody LoginUserRequest request
+    ) {
+        String token = userService.login(request);
+        return ResponseEntity.ok(new LoginUserResponse(token));
+    }
+
 }

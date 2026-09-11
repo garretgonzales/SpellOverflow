@@ -6,6 +6,7 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import com.spelloverflow.domain.InvalidCredentialsException;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -41,6 +42,17 @@ public class GlobalExceptionHandler {
         return new ApiErrorResponse(
                 "Request validation failed.",
                 errors
+        );
+    }
+
+    @ExceptionHandler(InvalidCredentialsException.class)
+    @ResponseStatus(HttpStatus.UNAUTHORIZED)
+    public ApiErrorResponse handleInvalidCredentials(
+            InvalidCredentialsException exception
+    ) {
+        return new ApiErrorResponse(
+                "Invalid email or password.",
+                Map.of()
         );
     }
 }
