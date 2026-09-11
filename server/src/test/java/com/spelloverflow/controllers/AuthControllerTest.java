@@ -19,6 +19,10 @@ import static org.mockito.Mockito.verifyNoInteractions;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import com.spelloverflow.domain.InvalidCredentialsException;
+import com.spelloverflow.dto.LoginUserRequest;
+
+
 
 @WebMvcTest(AuthController.class)
 @Import({SecurityConfig.class, GlobalExceptionHandler.class})
@@ -102,5 +106,58 @@ class AuthControllerTest {
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.message")
                         .value("Username is already taken."));
+    }
+
+    @Test
+    void shouldReturnTokenWhenLoginIsValid() throws Exception {
+        given(userService.login(any(LoginUserRequest.class)))
+                .willReturn("test-token");
+
+        mockMvc.perform(post("/api/auth/login")
+                       .contentType(MediaType.APPLICATION_JSON)
+                       .content("""
+                            {
+                              "email": "wand@example.com",
+                              "password": "spell-password"
+                            }
+                            """))
+               .andExpect(status().isOk())
+               .andExpect(jsonPath("$.token").value("test-token"));
+    }
+
+    @Test
+    void shouldRejectInvalidLoginInput() throws Exception {
+        mockMvc.perform(post("/api/auth/login")
+                       .contentType(MediaType.APPLICATION_JSON)
+                       .content("""
+                            {
+                              "email": "not-an-email",
+                              "password": ""
+                            }
+                            """))
+               .andExpect(status().isBadRequest())
+               .andExpect(jsonPath("$.errors.email").exists())
+               .andExpect(jsonPath("$.errors.password").exists());
+
+        verifyNoInteractions(userService);
+    }
+
+    @Test
+    void shouldReturnUnauthorizedWhenCredentialsAreInvalid() throws Exception {
+        given(userService.login(any(LoginUserRequest.class)))
+                .willThrow(new InvalidCredentialsException());
+
+        mockMvc.perform(post("/api/auth/login")
+                       .contentType(MediaType.APPLICATION_JSON)
+                       .content("""
+                            {
+                              "email": "wand@example.com",
+                              "password": "incorrect-password"
+                            }
+                            """))
+               .andExpect(status().isUnauthorized())
+               .andExpect(jsonPath("$.message")
+                       .value("Invalid email or password."))
+               .andExpect(jsonPath("$.token").doesNotExist());
     }
 }
