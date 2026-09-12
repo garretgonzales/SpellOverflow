@@ -1,6 +1,8 @@
 package com.spelloverflow.controllers;
 
+import com.spelloverflow.config.JwtAuthenticationFilter;
 import com.spelloverflow.config.SecurityConfig;
+import com.spelloverflow.domain.JwtService;
 import com.spelloverflow.domain.UserService;
 import com.spelloverflow.dto.RegisterUserRequest;
 import com.spelloverflow.models.User;
@@ -25,7 +27,7 @@ import com.spelloverflow.dto.LoginUserRequest;
 
 
 @WebMvcTest(AuthController.class)
-@Import({SecurityConfig.class, GlobalExceptionHandler.class})
+@Import({SecurityConfig.class, GlobalExceptionHandler.class, JwtAuthenticationFilter.class, JwtService.class})
 class AuthControllerTest {
 
     @Autowired
