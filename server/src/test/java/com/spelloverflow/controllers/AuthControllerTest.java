@@ -3,6 +3,7 @@ package com.spelloverflow.controllers;
 import com.spelloverflow.config.JwtAuthenticationFilter;
 import com.spelloverflow.config.SecurityConfig;
 import com.spelloverflow.domain.JwtService;
+import com.spelloverflow.domain.LoginResult;
 import com.spelloverflow.domain.UserService;
 import com.spelloverflow.dto.RegisterUserRequest;
 import com.spelloverflow.models.User;
@@ -112,8 +113,14 @@ class AuthControllerTest {
 
     @Test
     void shouldReturnTokenWhenLoginIsValid() throws Exception {
+        User user = new User(
+                "wand_wrangler",
+                "wand@example.com",
+                "encoded-password"
+        );
+
         given(userService.login(any(LoginUserRequest.class)))
-                .willReturn("test-token");
+                .willReturn(new LoginResult(user, "test-token"));
 
         mockMvc.perform(post("/api/auth/login")
                        .contentType(MediaType.APPLICATION_JSON)
@@ -124,7 +131,8 @@ class AuthControllerTest {
                             }
                             """))
                .andExpect(status().isOk())
-               .andExpect(jsonPath("$.token").value("test-token"));
+               .andExpect(jsonPath("$.token").value("test-token"))
+               .andExpect(jsonPath("$.username").value("wand_wrangler"));
     }
 
     @Test

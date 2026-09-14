@@ -50,7 +50,7 @@ public class UserService {
 
     }
 
-    public String login(LoginUserRequest request) {
+    public LoginResult login(LoginUserRequest request) {
         User user = userRepository.findByEmail(request.getEmail())
                 .orElseThrow(InvalidCredentialsException::new);
 
@@ -61,7 +61,8 @@ public class UserService {
             throw new InvalidCredentialsException();
         }
 
-        return jwtService.generateToken(user.getId(), user.getUsername());
+        String token = jwtService.generateToken(user.getId(), user.getUsername());
+        return new LoginResult(user, token);
     }
 
 

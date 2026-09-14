@@ -1,5 +1,6 @@
 package com.spelloverflow.controllers;
 
+import com.spelloverflow.domain.LoginResult;
 import com.spelloverflow.domain.UserService;
 import com.spelloverflow.dto.RegisterUserRequest;
 import com.spelloverflow.dto.RegisterUserResponse;
@@ -43,8 +44,15 @@ public class AuthController {
     public ResponseEntity<LoginUserResponse> login(
             @Valid @RequestBody LoginUserRequest request
     ) {
-        String token = userService.login(request);
-        return ResponseEntity.ok(new LoginUserResponse(token));
+        LoginResult result = userService.login(request);
+
+        LoginUserResponse response = new LoginUserResponse(
+                result.user().getId(),
+                result.user().getUsername(),
+                result.token()
+        );
+
+        return ResponseEntity.ok(response);
     }
 
 }

@@ -144,7 +144,7 @@ class UserServiceTest {
 
     // jwt service tests
     @Test
-    void shouldReturnTokenWhenCredentialsAreValid() {
+    void shouldReturnUserAndTokenWhenCredentialsAreValid() {
         LoginUserRequest request = new LoginUserRequest();
         request.setEmail("wand@example.com");
         request.setPassword("spell-password");
@@ -166,9 +166,10 @@ class UserServiceTest {
         given(jwtService.generateToken(42L, "wand_wrangler"))
                 .willReturn("signed-token");
 
-        String token = userService.login(request);
+        LoginResult result = userService.login(request);
 
-        assertThat(token).isEqualTo("signed-token");
+        assertThat(result.user()).isSameAs(user);
+        assertThat(result.token()).isEqualTo("signed-token");
     }
 
     @Test
