@@ -53,4 +53,8 @@ public class JwtService {
                 .getPayload();
     }
 
+    public long getExpirationMs() {
+        return expirationMs;
+    }
+
 }

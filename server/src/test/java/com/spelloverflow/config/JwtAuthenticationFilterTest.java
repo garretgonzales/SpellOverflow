@@ -3,6 +3,7 @@ package com.spelloverflow.config;
 import com.spelloverflow.domain.AuthenticatedUser;
 import com.spelloverflow.domain.JwtService;
 import jakarta.servlet.FilterChain;
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.junit.jupiter.api.AfterEach;
@@ -29,13 +30,15 @@ class JwtAuthenticationFilterTest {
     }
 
     @Test
-    void shouldAuthenticateWhenTokenIsValid() throws Exception {
+    void shouldAuthenticateWhenCookieTokenIsValid() throws Exception {
         String token = jwtService.generateToken(42L, "wand_wrangler");
 
         HttpServletRequest request = mock(HttpServletRequest.class);
         HttpServletResponse response = mock(HttpServletResponse.class);
         FilterChain chain = mock(FilterChain.class);
-        when(request.getHeader("Authorization")).thenReturn("Bearer " + token);
+        when(request.getCookies()).thenReturn(new Cookie[]{
+                new Cookie(JwtAuthenticationFilter.AUTH_COOKIE_NAME, token)
+        });
 
         filter.doFilter(request, response, chain);
 
@@ -47,7 +50,7 @@ class JwtAuthenticationFilterTest {
     }
 
     @Test
-    void shouldProceedUnauthenticatedWhenHeaderIsMissing() throws Exception {
+    void shouldProceedUnauthenticatedWhenCookieIsMissing() throws Exception {
         HttpServletRequest request = mock(HttpServletRequest.class);
         HttpServletResponse response = mock(HttpServletResponse.class);
         FilterChain chain = mock(FilterChain.class);
@@ -59,11 +62,13 @@ class JwtAuthenticationFilterTest {
     }
 
     @Test
-    void shouldProceedUnauthenticatedWhenHeaderIsNotBearer() throws Exception {
+    void shouldProceedUnauthenticatedWhenCookieNameDoesNotMatch() throws Exception {
         HttpServletRequest request = mock(HttpServletRequest.class);
         HttpServletResponse response = mock(HttpServletResponse.class);
         FilterChain chain = mock(FilterChain.class);
-        when(request.getHeader("Authorization")).thenReturn("Basic dXNlcjpwYXNz");
+        when(request.getCookies()).thenReturn(new Cookie[]{
+                new Cookie("some_other_cookie", "value")
+        });
 
         filter.doFilter(request, response, chain);
 
@@ -76,7 +81,9 @@ class JwtAuthenticationFilterTest {
         HttpServletRequest request = mock(HttpServletRequest.class);
         HttpServletResponse response = mock(HttpServletResponse.class);
         FilterChain chain = mock(FilterChain.class);
-        when(request.getHeader("Authorization")).thenReturn("Bearer not-a-real-token");
+        when(request.getCookies()).thenReturn(new Cookie[]{
+                new Cookie(JwtAuthenticationFilter.AUTH_COOKIE_NAME, "not-a-real-token")
+        });
 
         filter.doFilter(request, response, chain);
 

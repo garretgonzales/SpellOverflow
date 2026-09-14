@@ -7,6 +7,7 @@ import com.spelloverflow.domain.LoginResult;
 import com.spelloverflow.domain.UserService;
 import com.spelloverflow.dto.RegisterUserRequest;
 import com.spelloverflow.models.User;
+import jakarta.servlet.http.Cookie;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -19,7 +20,9 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.cookie;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import com.spelloverflow.domain.InvalidCredentialsException;
@@ -33,6 +36,9 @@ class AuthControllerTest {
 
     @Autowired
     private MockMvc mockMvc;
+
+    @Autowired
+    private JwtService jwtService;
 
     @MockitoBean
     private UserService userService;
@@ -112,7 +118,7 @@ class AuthControllerTest {
     }
 
     @Test
-    void shouldReturnTokenWhenLoginIsValid() throws Exception {
+    void shouldSetAuthCookieWhenLoginIsValid() throws Exception {
         User user = new User(
                 "wand_wrangler",
                 "wand@example.com",
@@ -126,13 +132,64 @@ class AuthControllerTest {
                        .contentType(MediaType.APPLICATION_JSON)
                        .content("""
                             {
-                              "email": "wand@example.com",
+                              "usernameOrEmail": "wand@example.com",
                               "password": "spell-password"
                             }
                             """))
                .andExpect(status().isOk())
-               .andExpect(jsonPath("$.token").value("test-token"))
+               .andExpect(jsonPath("$.token").doesNotExist())
+               .andExpect(jsonPath("$.username").value("wand_wrangler"))
+               .andExpect(cookie().value(JwtAuthenticationFilter.AUTH_COOKIE_NAME, "test-token"))
+               .andExpect(cookie().httpOnly(JwtAuthenticationFilter.AUTH_COOKIE_NAME, true))
+               .andExpect(cookie().path(JwtAuthenticationFilter.AUTH_COOKIE_NAME, "/"));
+    }
+
+    @Test
+    void shouldSetAuthCookieWhenLoggingInWithUsername() throws Exception {
+        User user = new User(
+                "wand_wrangler",
+                "wand@example.com",
+                "encoded-password"
+        );
+
+        given(userService.login(any(LoginUserRequest.class)))
+                .willReturn(new LoginResult(user, "test-token"));
+
+        mockMvc.perform(post("/api/auth/login")
+                       .contentType(MediaType.APPLICATION_JSON)
+                       .content("""
+                            {
+                              "usernameOrEmail": "wand_wrangler",
+                              "password": "spell-password"
+                            }
+                            """))
+               .andExpect(status().isOk())
+               .andExpect(jsonPath("$.username").value("wand_wrangler"))
+               .andExpect(cookie().value(JwtAuthenticationFilter.AUTH_COOKIE_NAME, "test-token"));
+    }
+
+    @Test
+    void shouldReturnCurrentUserWhenAuthenticated() throws Exception {
+        String token = jwtService.generateToken(7L, "wand_wrangler");
+
+        mockMvc.perform(get("/api/auth/me")
+                       .cookie(new Cookie(JwtAuthenticationFilter.AUTH_COOKIE_NAME, token)))
+               .andExpect(status().isOk())
+               .andExpect(jsonPath("$.id").value(7))
                .andExpect(jsonPath("$.username").value("wand_wrangler"));
+    }
+
+    @Test
+    void shouldRejectMeWhenNotAuthenticated() throws Exception {
+        mockMvc.perform(get("/api/auth/me"))
+               .andExpect(status().is4xxClientError());
+    }
+
+    @Test
+    void shouldClearAuthCookieOnLogout() throws Exception {
+        mockMvc.perform(post("/api/auth/logout"))
+               .andExpect(status().isNoContent())
+               .andExpect(cookie().maxAge(JwtAuthenticationFilter.AUTH_COOKIE_NAME, 0));
     }
 
     @Test
@@ -141,12 +198,12 @@ class AuthControllerTest {
                        .contentType(MediaType.APPLICATION_JSON)
                        .content("""
                             {
-                              "email": "not-an-email",
+                              "usernameOrEmail": "",
                               "password": ""
                             }
                             """))
                .andExpect(status().isBadRequest())
-               .andExpect(jsonPath("$.errors.email").exists())
+               .andExpect(jsonPath("$.errors.usernameOrEmail").exists())
                .andExpect(jsonPath("$.errors.password").exists());
 
         verifyNoInteractions(userService);
@@ -161,13 +218,13 @@ class AuthControllerTest {
                        .contentType(MediaType.APPLICATION_JSON)
                        .content("""
                             {
-                              "email": "wand@example.com",
+                              "usernameOrEmail": "wand@example.com",
                               "password": "incorrect-password"
                             }
                             """))
                .andExpect(status().isUnauthorized())
                .andExpect(jsonPath("$.message")
-                       .value("Invalid email or password."))
+                       .value("Invalid username, email, or password."))
                .andExpect(jsonPath("$.token").doesNotExist());
     }
 }

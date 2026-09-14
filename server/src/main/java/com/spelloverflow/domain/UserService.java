@@ -51,7 +51,7 @@ public class UserService {
     }
 
     public LoginResult login(LoginUserRequest request) {
-        User user = userRepository.findByEmail(request.getEmail())
+        User user = userRepository.findByUsernameOrEmail(request.getUsernameOrEmail())
                 .orElseThrow(InvalidCredentialsException::new);
 
         if (!passwordEncoder.matches(
