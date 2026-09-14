@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useId, useState } from "react";
 
 const initialForm = {
   username: "",
@@ -8,6 +8,7 @@ const initialForm = {
 };
 
 function RegisterPage() {
+  const id = useId();
   const [form, setForm] = useState(initialForm);
   const [fieldErrors, setFieldErrors] = useState({});
   const [formError, setFormError] = useState("");
@@ -67,9 +68,9 @@ function RegisterPage() {
 
       <form onSubmit={handleSubmit} noValidate>
         <div>
-          <label htmlFor="username">Username</label>
+          <label htmlFor={`${id}-username`}>Username</label>
           <input
-            id="username"
+            id={`${id}-username`}
             name="username"
             type="text"
             value={form.username}
@@ -80,9 +81,9 @@ function RegisterPage() {
         </div>
 
         <div>
-          <label htmlFor="email">Email</label>
+          <label htmlFor={`${id}-email`}>Email</label>
           <input
-            id="email"
+            id={`${id}-email`}
             name="email"
             type="email"
             value={form.email}
@@ -93,9 +94,9 @@ function RegisterPage() {
         </div>
 
         <div>
-          <label htmlFor="password">Password</label>
+          <label htmlFor={`${id}-password`}>Password</label>
           <input
-            id="password"
+            id={`${id}-password`}
             name="password"
             type="password"
             value={form.password}
@@ -106,9 +107,9 @@ function RegisterPage() {
         </div>
 
         <div>
-          <label htmlFor="confirmPassword">Confirm password</label>
+          <label htmlFor={`${id}-confirmPassword`}>Confirm password</label>
           <input
-            id="confirmPassword"
+            id={`${id}-confirmPassword`}
             name="confirmPassword"
             type="password"
             value={form.confirmPassword}

@@ -1,13 +1,14 @@
-import { useState } from "react";
+import { useId, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import useAuth from "../context/useAuth";
 
 const initialForm = {
-  email: "",
+  usernameOrEmail: "",
   password: "",
 };
 
-function LoginPage() {
+function LoginPage({ onSuccess }) {
+  const id = useId();
   const { login } = useAuth();
   const navigate = useNavigate();
   const [form, setForm] = useState(initialForm);
@@ -54,7 +55,12 @@ function LoginPage() {
         username: responseBody.username,
       });
       setForm(initialForm);
-      navigate("/");
+
+      if (onSuccess) {
+        onSuccess();
+      } else {
+        navigate("/");
+      }
     } catch {
       setFormError(
         "Unable to reach SpellOverflow. Make sure the backend is up and running.",
@@ -70,22 +76,24 @@ function LoginPage() {
 
       <form onSubmit={handleSubmit} noValidate>
         <div>
-          <label htmlFor="email">Email</label>
+          <label htmlFor={`${id}-usernameOrEmail`}>Username or email</label>
           <input
-            id="email"
-            name="email"
-            type="email"
-            value={form.email}
+            id={`${id}-usernameOrEmail`}
+            name="usernameOrEmail"
+            type="text"
+            value={form.usernameOrEmail}
             onChange={handleChange}
-            autoComplete="email"
+            autoComplete="username"
           />
-          {fieldErrors.email && <p role="alert">{fieldErrors.email}</p>}
+          {fieldErrors.usernameOrEmail && (
+            <p role="alert">{fieldErrors.usernameOrEmail}</p>
+          )}
         </div>
 
         <div>
-          <label htmlFor="password">Password</label>
+          <label htmlFor={`${id}-password`}>Password</label>
           <input
-            id="password"
+            id={`${id}-password`}
             name="password"
             type="password"
             value={form.password}

@@ -1,0 +1,130 @@
+.navbar {
+  background: #1a1a1a;
+  color: #fff;
+}
+
+.navbar nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 16px;
+  padding: 12px 24px;
+  box-sizing: border-box;
+}
+
+.navbar-brand {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #fff;
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 20px;
+}
+
+.navbar-brand img {
+  height: 28px;
+  width: 28px;
+}
+
+.navbar-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.navbar-username {
+  color: #d1d5db;
+  font-size: 14px;
+}
+
+.navbar-actions a,
+.navbar-actions button {
+  font: inherit;
+  text-decoration: none;
+  border-radius: 4px;
+  padding: 8px 14px;
+  font-size: 14px;
+  cursor: pointer;
+  border: 1px solid transparent;
+}
+
+.navbar-actions .btn-outline {
+  color: #fff;
+  border-color: #6b7280;
+  background: transparent;
+}
+
+.navbar-actions .btn-outline:hover {
+  border-color: #9ca3af;
+}
+
+.navbar-actions .btn-solid {
+  color: #fff;
+  background: var(--accent);
+  border-color: var(--accent);
+}
+
+.navbar-actions .btn-solid:hover {
+  filter: brightness(1.1);
+}
+
+dialog.modal {
+  width: 400px;
+  max-width: calc(100% - 32px);
+  max-height: 90vh;
+  overflow-y: auto;
+  box-sizing: border-box;
+  padding: 32px;
+  border: none;
+  border-radius: 8px;
+  background: var(--bg);
+  box-shadow: var(--shadow);
+  opacity: 1;
+  transition:
+    opacity 200ms ease,
+    display 200ms allow-discrete,
+    overlay 200ms allow-discrete;
+}
+
+dialog.modal::backdrop {
+  background: rgba(0, 0, 0, 0.5);
+  opacity: 1;
+  transition:
+    opacity 200ms ease,
+    display 200ms allow-discrete,
+    overlay 200ms allow-discrete;
+}
+
+dialog.modal:not([open]) {
+  opacity: 0;
+}
+
+@starting-style {
+  dialog.modal[open] {
+    opacity: 0;
+  }
+
+  dialog.modal[open]::backdrop {
+    opacity: 0;
+  }
+}
+
+.modal h1 {
+  font-size: 22px;
+  letter-spacing: normal;
+  margin: 0 32px 16px 0;
+}
+
+.modal-close {
+  position: absolute;
+  top: 8px;
+  right: 12px;
+  background: none;
+  border: none;
+  font-size: 24px;
+  line-height: 1;
+  color: var(--text);
+  cursor: pointer;
+}
