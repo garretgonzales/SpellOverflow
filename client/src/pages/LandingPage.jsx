@@ -1,14 +1,16 @@
-import { Link } from "react-router-dom";
+import useAuth from "../context/useAuth";
 
 function LandingPage() {
+  const { auth, isLoading } = useAuth();
+
   return (
     <main>
       <h1>SpellOverflow</h1>
       <p>Where clumsy Wizards debug their broken incantations.</p>
-      <nav>
-        <Link to="/register">Create an account</Link>
-        <Link to="/login">Login</Link>
-      </nav>
+
+      {!isLoading && auth?.user && (
+        <p>Welcome back, {auth.user.username}.</p>
+      )}
     </main>
   );
 }
