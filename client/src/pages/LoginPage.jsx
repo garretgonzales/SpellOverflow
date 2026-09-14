@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import useAuth from "../context/useAuth";
 
 const initialForm = {
@@ -8,6 +9,7 @@ const initialForm = {
 
 function LoginPage() {
   const { login } = useAuth();
+  const navigate = useNavigate();
   const [form, setForm] = useState(initialForm);
   const [fieldErrors, setFieldErrors] = useState({});
   const [formError, setFormError] = useState("");
@@ -32,6 +34,7 @@ function LoginPage() {
     try {
       const response = await fetch("/api/auth/login", {
         method: "POST",
+        credentials: "include",
         headers: {
           "Content-Type": "application/json",
         },
@@ -46,11 +49,12 @@ function LoginPage() {
         return;
       }
 
-      login(responseBody.token, {
+      login({
         id: responseBody.id,
         username: responseBody.username,
       });
       setForm(initialForm);
+      navigate("/");
     } catch {
       setFormError(
         "Unable to reach SpellOverflow. Make sure the backend is up and running.",
