@@ -144,9 +144,9 @@ class UserServiceTest {
 
     // jwt service tests
     @Test
-    void shouldReturnUserAndTokenWhenCredentialsAreValid() {
+    void shouldReturnUserAndTokenWhenLoggingInWithEmail() {
         LoginUserRequest request = new LoginUserRequest();
-        request.setEmail("wand@example.com");
+        request.setUsernameOrEmail("wand@example.com");
         request.setPassword("spell-password");
 
         User user = new User(
@@ -157,7 +157,7 @@ class UserServiceTest {
 
         ReflectionTestUtils.setField(user, "id", 42L);
 
-        given(userRepository.findByEmail(request.getEmail()))
+        given(userRepository.findByUsernameOrEmail(request.getUsernameOrEmail()))
                 .willReturn(Optional.of(user));
         given(passwordEncoder.matches(
                 request.getPassword(),
@@ -173,17 +173,46 @@ class UserServiceTest {
     }
 
     @Test
-    void shouldRejectLoginWhenEmailDoesNotExist() {
+    void shouldReturnUserAndTokenWhenLoggingInWithUsername() {
         LoginUserRequest request = new LoginUserRequest();
-        request.setEmail("missing@example.com");
+        request.setUsernameOrEmail("wand_wrangler");
         request.setPassword("spell-password");
 
-        given(userRepository.findByEmail(request.getEmail()))
+        User user = new User(
+                "wand_wrangler",
+                "wand@example.com",
+                "encoded-password"
+        );
+
+        ReflectionTestUtils.setField(user, "id", 42L);
+
+        given(userRepository.findByUsernameOrEmail(request.getUsernameOrEmail()))
+                .willReturn(Optional.of(user));
+        given(passwordEncoder.matches(
+                request.getPassword(),
+                user.getPasswordHash()
+        )).willReturn(true);
+        given(jwtService.generateToken(42L, "wand_wrangler"))
+                .willReturn("signed-token");
+
+        LoginResult result = userService.login(request);
+
+        assertThat(result.user()).isSameAs(user);
+        assertThat(result.token()).isEqualTo("signed-token");
+    }
+
+    @Test
+    void shouldRejectLoginWhenIdentifierDoesNotExist() {
+        LoginUserRequest request = new LoginUserRequest();
+        request.setUsernameOrEmail("missing@example.com");
+        request.setPassword("spell-password");
+
+        given(userRepository.findByUsernameOrEmail(request.getUsernameOrEmail()))
                 .willReturn(Optional.empty());
 
         assertThatThrownBy(() -> userService.login(request))
                 .isInstanceOf(InvalidCredentialsException.class)
-                .hasMessage("Invalid email or password.");
+                .hasMessage("Invalid username, email, or password.");
 
         verifyNoInteractions(passwordEncoder, jwtService);
     }
@@ -191,7 +220,7 @@ class UserServiceTest {
     @Test
     void shouldRejectLoginWhenPasswordIsIncorrect() {
         LoginUserRequest request = new LoginUserRequest();
-        request.setEmail("wand@example.com");
+        request.setUsernameOrEmail("wand@example.com");
         request.setPassword("wrong-password");
 
         User user = new User(
@@ -200,7 +229,7 @@ class UserServiceTest {
                 "encoded-password"
         );
 
-        given(userRepository.findByEmail(request.getEmail()))
+        given(userRepository.findByUsernameOrEmail(request.getUsernameOrEmail()))
                 .willReturn(Optional.of(user));
         given(passwordEncoder.matches(
                 request.getPassword(),
@@ -209,7 +238,7 @@ class UserServiceTest {
 
         assertThatThrownBy(() -> userService.login(request))
                 .isInstanceOf(InvalidCredentialsException.class)
-                .hasMessage("Invalid email or password.");
+                .hasMessage("Invalid username, email, or password.");
 
         verifyNoInteractions(jwtService);
     }

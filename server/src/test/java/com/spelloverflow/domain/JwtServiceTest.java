@@ -70,8 +70,14 @@ class JwtServiceTest {
         JwtService jwtService = new JwtService(TEST_SECRET, 3_600_000);
         String token = jwtService.generateToken(42L, "wand_wrangler");
 
-        String tamperedToken = token.substring(0, token.length() - 1)
-                + (token.endsWith("A") ? "B" : "A");
+        // Flip the second-to-last character rather than the last: a base64url-encoded
+        // 256-bit signature has 2 unused padding bits in its final character, so tampering
+        // that one can decode back to the same bytes and leave the signature valid.
+        int tamperIndex = token.length() - 2;
+        char tamperedChar = token.charAt(tamperIndex) == 'A' ? 'B' : 'A';
+        String tamperedToken = token.substring(0, tamperIndex)
+                + tamperedChar
+                + token.substring(tamperIndex + 1);
 
         assertThatThrownBy(() -> jwtService.parseToken(tamperedToken))
                 .isInstanceOf(SignatureException.class);

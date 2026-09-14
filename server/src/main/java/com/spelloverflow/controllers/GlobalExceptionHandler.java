@@ -51,7 +51,7 @@ public class GlobalExceptionHandler {
             InvalidCredentialsException exception
     ) {
         return new ApiErrorResponse(
-                "Invalid email or password.",
+                exception.getMessage(),
                 Map.of()
         );
     }
